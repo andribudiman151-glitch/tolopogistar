@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- Pengaman layar putih: CSS kritis inline & pembersih cache lama jika ada -->
+<style>
+html,body{background:#07111F;color:#fff;margin:0}
+.network-bg{position:fixed;inset:0;z-index:0;opacity:.65}
+</style>
+<script>
+(function(){
+  try{
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      if(!regs.length)return;
+      Promise.all(regs.map(function(r){return r.unregister();}))
+        .then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));}):0;})
+        .then(function(){location.reload();});
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profil Pengembang - 3D Interactive Topologi Jaringan Star</title>
+<meta name="description" content="Profil Pengembang Media Pembelajaran Interaktif 3D Topologi Jaringan Star - Andri Budiman, NIM 2510130210011, Fakultas Keguruan dan Ilmu Pendidikan, Universitas Lambung Mangkurat." />
+<meta property="og:title" content="Profil Pengembang - 3D Interactive Topologi Jaringan Star" />
+<meta property="og:description" content="Profil Pengembang Media Pembelajaran Interaktif 3D Topologi Jaringan Star - Andri Budiman, NIM 2510130210011, Fakultas Keguruan dan Ilmu Pendidikan, Universitas Lambung Mangkurat." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="developer-page-body">
+
+<!-- Overlay Transisi Antar Halaman Halus -->
+<div id="page-transition-overlay" class="page-transition-overlay" aria-hidden="true">
+    <div class="page-transition-spinner"></div>
+    <div class="page-transition-text">Memuat Halaman...</div>
+</div>
+
+<!-- Background Canvas Node Jaringan Animatif -->
+<canvas id="network-bg" class="network-bg"></canvas>
+
+<!-- ======================= TOP NAVIGATION BAR ======================= -->
+<header class="top-bar">
+    <div class="brand"><span class="dot"></span> Topologi Star 3D</div>
+
+    <!-- Active Indicator / Developer Pill -->
+    <div class="topbar-dev-pill" title="Halaman Profil Pengembang" style="border-color:var(--cyan); box-shadow:0 0 16px rgba(0,217,255,0.35);">
+        <img src="logo-ulm.png" alt="Logo ULM" class="topbar-dev-photo" onerror="this.src='logo-ulman.png'" />
+        <div class="topbar-dev-info">
+            <span class="topbar-dev-badge-tag">HALAMAN PROFIL</span>
+            <span class="topbar-dev-fullname">Andri Budiman <small style="color:var(--cyan); font-weight:700;">(2510130210011)</small></span>
+            <span class="topbar-dev-subtitle">Pengembang Media Pembelajaran</span>
+        </div>
+    </div>
+
+    <div class="top-bar-actions">
+        <!-- Informasi Mahasiswa yang Sedang Login -->
+        <div id="student-nav-info" style="display:none;"></div>
+
+        <!-- Tombol Suara Interaktif -->
+        <button id="btn-sound-profile" class="icon-btn sound-toggle-btn" data-sound-toggle="true" aria-label="Pengaturan Suara" title="Suara Interaktif (Klik untuk Menyalakan/Mematikan)">
+            <span class="sound-btn-icon">🔊</span>
+            <span class="label-text sound-btn-text">Suara: ON</span>
+        </button>
+
+        <!-- Navigasi Menu Lain -->
+        <a href="materi.html" class="icon-btn" aria-label="Mulai Eksplorasi 3D" title="Eksplorasi Perangkat 3D">
+            🌐 <span class="label-text">Eksplorasi 3D</span>
+        </a>
+        <a href="kuis.html" class="icon-btn" aria-label="Kuis Evaluasi" title="Kuis Evaluasi Lengkap">
+            📝 <span class="label-text">Kuis Evaluasi</span>
+        </a>
+        <a href="index.html" class="icon-btn" aria-label="Kembali ke Beranda" title="Kembali ke Beranda">
+            🏠 <span class="label-text">Beranda</span>
+        </a>
+    </div>
+</header>
+
+<!-- ======================= KONTEN UTAMA PROFIL ======================= -->
+<main class="developer-page-container fade-in">
+    <!-- Header Halaman -->
+    <header class="dev-page-header">
+        <div class="section-label">PROFIL AKADEMIK & MEDIA</div>
+        <h1 class="dev-main-title">PROFIL PENGEMBANG</h1>
+        <p class="dev-main-subtitle">
+            Mengenal pengembang dan media pembelajaran interaktif 3D Topologi Jaringan Star.
+        </p>
+    </header>
+
+    <!-- ======================= BAGIAN C: KARTU PROFIL PENGEMBANG ======================= -->
+    <section class="dev-profile-hero-card" aria-label="Identitas Pengembang">
+        <div class="dev-hero-layout">
+            <!-- Pas Foto Pengembang (Desktop Kiri / Mobile Atas) -->
+            <div class="dev-photo-wrapper">
+                <div class="dev-main-photo-frame">
+                    <img 
+                        src="pass_foto_developer.jpg" 
+                        alt="Pas Foto Pengembang - Andri Budiman" 
+                        class="dev-main-photo" 
+                        onerror="this.onerror=null; this.src='/pass_foto_developer.jpg';" 
+                    />
+                </div>
+                <div class="dev-photo-caption">FOTO ASLI PENGEMBANG</div>
+            </div>
+
+            <!-- Identitas Lengkap Pengembang (Desktop Kanan / Mobile Bawah) -->
+            <div class="dev-identity-content">
+                <div class="dev-identity-header-row">
+                    <div class="dev-ulm-badge">
+                        <img src="logo-ulm.png" alt="Logo Universitas Lambung Mangkurat" class="dev-ulm-logo-img" onerror="this.src='logo-ulman.png'" />
+                        <div class="dev-ulm-text">
+                            <strong>UNIVERSITAS LAMBUNG MANGKURAT</strong>
+                            <span>Fakultas Keguruan dan Ilmu Pendidikan</span>
+                        </div>
+                    </div>
+                    <span class="dev-tag-role">👨‍💻 PENGEMBANG MEDIA PEMBELAJARAN</span>
+                </div>
+
+                <!-- Tabel Data Akademik -->
+                <div class="dev-info-table">
+                    <div class="dev-info-row">
+                        <span class="dev-info-label">Nama Lengkap</span>
+                        <strong class="dev-info-val">Andri Budiman</strong>
+                    </div>
+
+                    <div class="dev-info-row">
+                        <span class="dev-info-label">Nomor Induk Mahasiswa (NIM)</span>
+                        <strong class="dev-info-val nim-val">2510130210011</strong>
+                    </div>
+
+                    <div class="dev-info-row">
+                        <span class="dev-info-label">Fakultas</span>
+                        <span class="dev-info-val">Fakultas Keguruan dan Ilmu Pendidikan</span>
+                    </div>
+
+                    <div class="dev-info-row">
+                        <span class="dev-info-label">Program Studi / Jurusan</span>
+                        <span class="dev-info-val">Teknologi Pendidikan</span>
+                    </div>
+
+                    <div class="dev-info-row" style="grid-column: 1 / -1;">
+                        <span class="dev-info-label">Perguruan Tinggi</span>
+                        <span class="dev-info-val">Universitas Lambung Mangkurat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= BAGIAN D & E: INFORMASI PROYEK & DESKRIPSI MEDIA ======================= -->
+    <section class="dev-project-section">
+        <div class="glass-panel panel-padded">
+            <div class="dev-section-title-bar">
+                <span class="icon">📋</span>
+                <strong>INFORMASI PROYEK</strong>
+            </div>
+
+            <div class="project-meta-grid">
+                <div class="project-meta-item">
+                    <span class="project-meta-icon">🌐</span>
+                    <div class="project-meta-text">
+                        <span class="label">Nama Proyek</span>
+                        <strong class="value">3D INTERACTIVE TOPOLOGI JARINGAN STAR</strong>
+                    </div>
+                </div>
+
+                <div class="project-meta-item">
+                    <span class="project-meta-icon">📚</span>
+                    <div class="project-meta-text">
+                        <span class="label">Mata Pelajaran</span>
+                        <strong class="value">Dasar-Dasar Teknik Jaringan Komputer dan Telekomunikasi <span style="color:var(--cyan); font-weight:600;">(Dasar-Dasar TKJ)</span></strong>
+                    </div>
+                </div>
+
+                <div class="project-meta-item">
+                    <span class="project-meta-icon">🖥️</span>
+                    <div class="project-meta-text">
+                        <span class="label">Media Pembelajaran</span>
+                        <strong class="value">3D Topologi Star dan Simulasinya</strong>
+                    </div>
+                </div>
+
+                <div class="project-meta-item">
+                    <span class="project-meta-icon">🎯</span>
+                    <div class="project-meta-text">
+                        <span class="label">Fase Kurikulum</span>
+                        <strong class="value">Fase E</strong>
+                    </div>
+                </div>
+
+                <div class="project-meta-item">
+                    <span class="project-meta-icon">🏫</span>
+                    <div class="project-meta-text">
+                        <span class="label">Target Sasaran</span>
+                        <strong class="value">Kelas X SMK</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deskripsi Media Pembelajaran -->
+            <div class="dev-section-title-bar" style="margin-top:24px; font-size:1.05rem;">
+                <span class="icon">📖</span>
+                <strong>DESKRIPSI MEDIA PEMBELAJARAN</strong>
+            </div>
+
+            <div class="dev-media-desc-box">
+                <p>
+                    “3D Interactive Topologi Jaringan Star merupakan media pembelajaran interaktif yang dirancang untuk membantu peserta didik memahami konsep, komponen perangkat, dan alur komunikasi pada topologi jaringan star. Melalui visualisasi model tiga dimensi dan simulasi interaktif, peserta didik dapat mengeksplorasi perangkat jaringan serta memahami hubungan antara setiap komponen dalam suatu jaringan komputer.”
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= BAGIAN F: FITUR MEDIA PEMBELAJARAN ======================= -->
+    <section class="glass-panel panel-padded" style="margin-bottom:28px;" aria-label="Fitur Media Pembelajaran">
+        <div class="dev-section-title-bar">
+            <span class="icon">⚡</span>
+            <strong>FITUR MEDIA PEMBELAJARAN</strong>
+        </div>
+
+        <p style="color:var(--gray); font-size:0.92rem; margin-bottom:16px;">
+            Berikut adalah modul dan kemampuan interaktif utama yang terimplementasi secara fungsional dalam media pembelajaran ini:
+        </p>
+
+        <div class="features-grid">
+            <!-- 1. Visualisasi model 3D -->
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-num-badge">1</span>
+                    <span class="feature-icon-box">🌐</span>
+                    <h3 class="feature-title">Visualisasi Model 3D</h3>
+                </div>
+                <p class="feature-desc">
+                    Rendering lingkungan 3D interaktif real-time dengan kendali rotasi kamera 360°, zoom in/out, reset sudut pandang, serta inspeksi mendalam mode hologram/wireframe perangkat.
+                </p>
+            </div>
+
+            <!-- 2. Eksplorasi komponen perangkat jaringan -->
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-num-badge">2</span>
+                    <span class="feature-icon-box">🔍</span>
+                    <h3 class="feature-title">Eksplorasi Komponen Perangkat</h3>
+                </div>
+                <p class="feature-desc">
+                    Eksplorasi interaktif detail perangkat keras fisik (Switch sentral 24-Port, PC Workstation Client 01–06, Router Gateway, Printer jaringan, Kabel UTP Cat6, dan Konektor RJ-45) beserta fungsi teknisnya.
+                </p>
+            </div>
+
+            <!-- 3. Simulasi alur komunikasi data -->
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-num-badge">3</span>
+                    <span class="feature-icon-box">⚡</span>
+                    <h3 class="feature-title">Simulasi Alur Komunikasi Data</h3>
+                </div>
+                <p class="feature-desc">
+                    Simulasi visual animasi dinamis perjalanan paket Ethernet Frame antar node point-to-point, mendemonstrasikan secara nyata peran sentral Switch sebagai konsentrator utama jalur data.
+                </p>
+            </div>
+
+            <!-- 4. Kuis interaktif -->
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-num-badge">4</span>
+                    <span class="feature-icon-box">🎯</span>
+                    <h3 class="feature-title">Kuis Interaktif</h3>
+                </div>
+                <p class="feature-desc">
+                    Checkpoint uji pemahaman langsung yang terintegrasi pada alur belajar untuk mengevaluasi pemahaman peserta didik terhadap peran Switch, koneksi fisik, dan pengalihan data.
+                </p>
+            </div>
+
+            <!-- 5. Evaluasi hasil belajar dan pembahasan jawaban -->
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-num-badge">5</span>
+                    <span class="feature-icon-box">📊</span>
+                    <h3 class="feature-title">Evaluasi Hasil & Pembahasan</h3>
+                </div>
+                <p class="feature-desc">
+                    Pengukuran skor evaluasi berbasis Kriteria Ketuntasan Minimal (KKM 75), telaah pembahasan mendalam bagi soal yang belum tepat, serta pencatatan nilai terpusat di dashboard admin.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= BAGIAN G: TOMBOL NAVIGASI ======================= -->
+    <div class="dev-page-actions">
+        <a href="index.html" class="btn btn-outline" style="min-width:220px;" aria-label="Kembali ke Beranda">
+            🏠 KEMBALI KE BERANDA
+        </a>
+        <a href="materi.html" class="btn btn-primary" style="min-width:220px;" aria-label="Mulai Pembelajaran Eksplorasi 3D">
+            MULAI PEMBELAJARAN ➔
+        </a>
+    </div>
+</main>
+
+<!-- Inisialisasi Script Interaksi: Background Canvas & Modul Audio/Auth -->
+<script src="js/loading.js"></script>
+<script type="module">
+import { initStudentNavBar } from './js/auth.js';
+import { soundManager } from './js/sound.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Inisialisasi tampilan bar status mahasiswa jika sedang login
+    initStudentNavBar();
+
+    // Pasang suara klik feedback pada semua tombol
+    soundManager.attachGlobalButtonSounds();
+
+    // Bind event tombol toggle suara
+    const soundToggleBtns = document.querySelectorAll('.sound-toggle-btn, [data-sound-toggle]');
+    soundToggleBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            soundManager.toggleSound();
+        });
+    });
+
+    // Transisi halus saat menekan tautan
+    const pageTransitionOverlay = document.getElementById('page-transition-overlay');
+    const navLinks = document.querySelectorAll('a[href$=".html"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const targetUrl = link.getAttribute('href');
+            if (targetUrl && !targetUrl.startsWith('#')) {
+                e.preventDefault();
+                soundManager.playClick();
+                if (pageTransitionOverlay) {
+                    pageTransitionOverlay.classList.add('active');
+                }
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 300);
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

@@ -2249,3 +2249,413 @@ select.field-select option { background: var(--dark-blue); color: var(--white); 
     .btn-row { flex-direction: column; }
     .option-item { padding: 14px 16px; }
 }
+
+/* =========================================================================
+   15. HALAMAN KHUSUS PROFIL PENGEMBANG (profil-pengembang.html)
+   ========================================================================= */
+.developer-page-container {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 36px 20px 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.dev-page-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.dev-main-title {
+    font-size: clamp(2rem, 4.5vw, 2.75rem);
+    color: var(--white);
+    letter-spacing: 0.02em;
+    margin: 8px 0 12px;
+    background: linear-gradient(135deg, #ffffff 40%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dev-main-subtitle {
+    color: var(--gray);
+    font-size: clamp(0.96rem, 1.8vw, 1.12rem);
+    max-width: 680px;
+    margin: 0 auto;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+/* Kartu Profil Utama Pengembang */
+.dev-profile-hero-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 34px 38px;
+    box-shadow: var(--shadow-soft), 0 0 25px rgba(0, 217, 255, 0.12);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 28px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.dev-profile-hero-card:hover {
+    border-color: rgba(0, 217, 255, 0.45);
+    box-shadow: var(--shadow-soft), 0 0 35px rgba(0, 217, 255, 0.22);
+}
+
+.dev-hero-layout {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+}
+
+.dev-photo-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.dev-main-photo-frame {
+    position: relative;
+    border-radius: 18px;
+    padding: 3px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    box-shadow: 0 0 26px rgba(0, 217, 255, 0.45);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dev-main-photo-frame:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(0, 217, 255, 0.65);
+}
+
+.dev-main-photo {
+    width: 175px;
+    height: 220px;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 15px;
+    background: #0B1F33;
+    display: block;
+}
+
+.dev-tag-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(0, 217, 255, 0.12);
+    border: 1px solid rgba(0, 217, 255, 0.45);
+    color: var(--cyan);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    font-family: var(--font-display);
+    white-space: nowrap;
+}
+
+.dev-identity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.dev-identity-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.dev-ulm-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dev-ulm-logo-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 217, 255, 0.4));
+}
+
+.dev-ulm-text strong {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--white);
+    letter-spacing: 0.02em;
+}
+
+.dev-ulm-text span {
+    font-size: 0.74rem;
+    color: var(--cyan);
+}
+
+.dev-info-table {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px 18px;
+}
+
+.dev-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.035);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0, 217, 255, 0.15);
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.dev-info-row:hover {
+    background: rgba(0, 217, 255, 0.06);
+    border-color: rgba(0, 217, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.dev-info-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gray);
+    font-weight: 600;
+}
+
+.dev-info-val {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.4;
+}
+
+.dev-info-val.nim-val {
+    color: var(--cyan);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* Bagian Informasi Proyek & Deskripsi */
+.dev-section-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.18rem;
+    font-family: var(--font-display);
+    color: var(--white);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 217, 255, 0.25);
+}
+
+.dev-section-title-bar span.icon {
+    font-size: 1.35rem;
+}
+
+.project-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.project-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(0, 217, 255, 0.18);
+    border-radius: var(--radius-md);
+    transition: all 0.25s ease;
+}
+
+.project-meta-item:hover {
+    border-color: rgba(0, 217, 255, 0.5);
+    background: rgba(0, 217, 255, 0.07);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.project-meta-icon {
+    font-size: 1.55rem;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.project-meta-text {
+    flex: 1;
+}
+
+.project-meta-text .label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.project-meta-text .value {
+    display: block;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.4;
+}
+
+.dev-media-desc-box {
+    background: rgba(13, 110, 253, 0.09);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-left: 4px solid var(--cyan);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    color: #e2eaf5;
+    font-size: 0.98rem;
+    line-height: 1.75;
+    margin-top: 14px;
+}
+
+.dev-media-desc-box p {
+    margin: 0;
+}
+
+/* Grid Fitur Media Pembelajaran */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 18px;
+    margin-top: 16px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    border-radius: var(--radius-md);
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--cyan);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 20px rgba(0, 217, 255, 0.25);
+    background: rgba(0, 217, 255, 0.06);
+}
+
+.feature-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.feature-num-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 217, 255, 0.15);
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    flex-shrink: 0;
+}
+
+.feature-icon-box {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.feature-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0;
+    line-height: 1.35;
+}
+
+.feature-desc {
+    color: var(--gray);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+}
+
+/* Navigasi Aksi Bawah */
+.dev-page-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-top: 36px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+    .developer-page-container {
+        padding: 24px 16px 50px;
+    }
+    .dev-profile-hero-card {
+        padding: 24px 20px;
+    }
+    .dev-hero-layout {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+    }
+    .dev-main-photo {
+        width: 135px;
+        height: 170px;
+        margin: 0 auto;
+    }
+    .dev-identity-header-row {
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .dev-info-table {
+        grid-template-columns: 1fr;
+        text-align: left;
+    }
+    .project-meta-grid {
+        grid-template-columns: 1fr;
+    }
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    .dev-page-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    .dev-page-actions .btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
