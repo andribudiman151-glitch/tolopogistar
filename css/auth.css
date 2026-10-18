@@ -1,0 +1,680 @@
+/* =========================================================================
+   css/auth.css - Gaya Khusus Halaman Login Mahasiswa & Panel Admin
+   Memakai variabel warna dan tema dari style.css
+   ========================================================================= */
+
+/* ---------- 1. LAYOUT AUTH UMUM (LOGIN MAHASISWA & LOGIN ADMIN) ---------- */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 16px;
+    position: relative;
+    background: radial-gradient(ellipse at top, var(--dark-blue) 0%, var(--navy) 80%);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-card {
+    padding: 34px 30px;
+    background: rgba(11, 31, 51, 0.85);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 217, 255, 0.12);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 26px;
+}
+
+.auth-campus-logo {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 14px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.auth-title {
+    font-size: 1.45rem;
+    color: var(--white);
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.auth-subtitle {
+    font-size: 0.86rem;
+    color: var(--gray);
+    line-height: 1.5;
+}
+
+/* ---------- 2. FORM & INPUT CONTROLS ---------- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.form-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e0eefb;
+    letter-spacing: 0.02em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-label .req {
+    color: var(--cyan);
+    margin-left: 2px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    transition: all 0.25s var(--ease);
+    outline: none;
+}
+
+.form-control:focus {
+    background: rgba(0, 217, 255, 0.08);
+    border-color: var(--cyan);
+    box-shadow: 0 0 14px rgba(0, 217, 255, 0.35);
+}
+
+.form-control.is-invalid {
+    border-color: #ff5c77;
+    background: rgba(255, 92, 119, 0.08);
+}
+
+.field-error {
+    font-size: 0.76rem;
+    color: #ff7b92;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+}
+
+select.form-control {
+    background-color: #0b1f33;
+    cursor: pointer;
+}
+
+select.form-control option {
+    background-color: #07111f;
+    color: #ffffff;
+    padding: 8px;
+}
+
+.auth-actions {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-footer-links {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.auth-link {
+    color: var(--cyan);
+    text-decoration: none;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+.auth-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px var(--cyan);
+}
+
+/* ---------- 3. STUDENT BADGE DI TOP BAR HALAMAN LAIN ---------- */
+.student-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(0, 217, 255, 0.12);
+    border: 1px solid rgba(0, 217, 255, 0.35);
+    font-size: 0.82rem;
+    color: var(--white);
+    backdrop-filter: blur(8px);
+}
+
+.student-name-text strong {
+    color: var(--cyan);
+}
+
+.student-logout-btn {
+    background: rgba(255, 92, 119, 0.22);
+    color: #ff99aa;
+    border: 1px solid rgba(255, 92, 119, 0.45);
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    pointer-events: auto !important;
+}
+
+.student-logout-btn:hover {
+    background: rgba(255, 92, 119, 0.45);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 92, 119, 0.4);
+}
+
+.student-logout-btn-action {
+    transition: all 0.25s var(--ease);
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.student-logout-btn-action:hover {
+    background: rgba(255, 92, 119, 0.2) !important;
+    border-color: #ff5c77 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(255, 92, 119, 0.35);
+}
+
+/* Modal Konfirmasi Logout yang Selalu Terlihat & Di Depan Semua Elemen */
+#modal-logout-confirm,
+.logout-modal-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 99999999 !important;
+    background: rgba(3, 8, 16, 0.88) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: auto !important;
+    padding: 20px !important;
+}
+
+#modal-logout-confirm.open,
+.logout-modal-overlay.open {
+    display: flex !important;
+}
+
+/* Cegah canvas confetti atau background animasi menghalangi klik tombol */
+canvas[style*="position: fixed"],
+canvas[style*="position:fixed"] {
+    pointer-events: none !important;
+}
+
+/* ---------- 4. ADMIN DASHBOARD LAYOUT ---------- */
+.admin-page {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, #0c2038 0%, #07111F 80%);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-header {
+    background: rgba(7, 17, 31, 0.92);
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-badge {
+    background: rgba(255, 193, 94, 0.18);
+    border: 1px solid rgba(255, 193, 94, 0.5);
+    color: #ffc15e;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+}
+
+.admin-main {
+    flex: 1;
+    padding: 28px 24px 60px;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Kartu Statistik Dashboard */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: rgba(11, 31, 51, 0.75);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--cyan);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    background: rgba(0, 217, 255, 0.12);
+    border: 1px solid rgba(0, 217, 255, 0.35);
+    flex-shrink: 0;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    color: var(--gray);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    color: var(--white);
+    line-height: 1.2;
+}
+
+.stat-card.stat-success .stat-icon {
+    background: rgba(0, 255, 136, 0.15);
+    border-color: rgba(0, 255, 136, 0.45);
+    color: #00ff88;
+}
+
+.stat-card.stat-fail .stat-icon {
+    background: rgba(255, 193, 94, 0.15);
+    border-color: rgba(255, 193, 94, 0.45);
+    color: #ffc15e;
+}
+
+/* Toolbar Filter & Pencarian */
+.admin-toolbar {
+    background: rgba(11, 31, 51, 0.75);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.toolbar-filters {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.search-box {
+    position: relative;
+    min-width: 240px;
+    flex: 1;
+}
+
+.search-input {
+    padding-left: 38px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.95rem;
+    color: var(--gray);
+    pointer-events: none;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Tabel Data Mahasiswa */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    background: rgba(11, 31, 51, 0.75);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.88rem;
+}
+
+.admin-table th {
+    background: rgba(7, 21, 38, 0.85);
+    padding: 14px 16px;
+    color: #cfe6f7;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-size: 0.76rem;
+    border-bottom: 1px solid rgba(0, 217, 255, 0.25);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.admin-table th.sortable {
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.admin-table th.sortable:hover {
+    background: rgba(0, 217, 255, 0.12);
+    color: var(--cyan);
+}
+
+.admin-table th .sort-indicator {
+    font-size: 0.7rem;
+    margin-left: 4px;
+    color: var(--gray);
+}
+
+.admin-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+    background: rgba(0, 217, 255, 0.04);
+}
+
+/* Status Pills dalam Tabel */
+.status-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.status-pill.success {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.4);
+}
+
+.status-pill.fail {
+    background: rgba(255, 193, 94, 0.15);
+    color: #ffc15e;
+    border: 1px solid rgba(255, 193, 94, 0.4);
+}
+
+.status-pill.empty {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--gray);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Tombol Aksi Tabel */
+.btn-action-icon {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-action-icon:hover {
+    background: rgba(0, 217, 255, 0.2);
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+.btn-action-icon.btn-danger:hover {
+    background: rgba(255, 92, 119, 0.25);
+    border-color: #ff5c77;
+    color: #ff99aa;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+}
+
+.empty-state-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.empty-state-desc {
+    font-size: 0.88rem;
+    color: var(--gray);
+    max-width: 400px;
+}
+
+/* Modal Detail Percobaan Kuis */
+.detail-attempts-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.attempt-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.attempt-item.passed {
+    border-left: 3px solid #00ff88;
+}
+
+.attempt-item.failed {
+    border-left: 3px solid #ffc15e;
+}
+
+/* Responsif Mobile & Tablet */
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 12px 16px;
+    }
+    .admin-main {
+        padding: 18px 12px 40px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .toolbar-filters {
+        flex-direction: column;
+        width: 100%;
+    }
+    .search-box {
+        width: 100%;
+    }
+    .toolbar-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .auth-card {
+        padding: 24px 18px;
+    }
+}
+
+/* Floating Toast Notifications for Admin */
+.admin-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 420px;
+    width: calc(100% - 40px);
+}
+
+.admin-toast {
+    pointer-events: auto;
+    background: rgba(11, 31, 51, 0.95);
+    border: 1px solid var(--cyan);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(0, 217, 255, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--white);
+    font-size: 0.88rem;
+    line-height: 1.4;
+    animation: adminToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    backdrop-filter: blur(12px);
+}
+
+.admin-toast.success {
+    border-color: #00ff88;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(0, 255, 136, 0.25);
+}
+
+.admin-toast.warning {
+    border-color: #ffc15e;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 193, 94, 0.25);
+}
+
+.admin-toast.error {
+    border-color: #ff5c77;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 92, 119, 0.3);
+}
+
+.admin-toast.fade-out {
+    animation: adminToastOut 0.3s ease forwards;
+}
+
+@keyframes adminToastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes adminToastOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+}

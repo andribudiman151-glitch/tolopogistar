@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- [FIX] Pengaman layar putih: (1) CSS kritis inline, (2) bersihkan Service Worker/cache lama -->
+<style>
+html,body{background:#07111F;color:#fff;margin:0}
+.screen{display:none}.screen.active{display:block}
+.network-bg{position:fixed;inset:0;z-index:0;opacity:.65}
+</style>
+<script>
+(function(){
+  try{
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      if(!regs.length)return;
+      Promise.all(regs.map(function(r){return r.unregister();}))
+        .then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));}):0;})
+        .then(function(){location.reload();});
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kuis Evaluasi - Topologi Jaringan Star</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="quiz-page">
+
+<!-- Top Bar -->
+<header class="top-bar">
+    <div class="brand"><span class="dot"></span> Topologi Star 3D</div>
+
+    <!-- Biodata Pengembang Pemrograman di Bagian Atas -->
+    <div class="topbar-dev-pill" title="Biodata Pengembang Pemrograman">
+        <img src="logo-ulm.png" alt="Logo ULM" class="topbar-dev-photo" onerror="this.src='logo-ulman.png'" />
+        <div class="topbar-dev-info">
+            <span class="topbar-dev-badge-tag">BIODATA PENGEMBANG</span>
+            <span class="topbar-dev-fullname">Andri Budiman <small style="color:var(--cyan); font-weight:700;">(2510130210011)</small></span>
+            <span class="topbar-dev-subtitle">Teknologi Pendidikan B • Pemrograman Komputer</span>
+        </div>
+    </div>
+
+    <div class="top-bar-actions">
+        <!-- Informasi Mahasiswa Login & Tombol Keluar -->
+        <div id="student-nav-info" style="display:none;"></div>
+        <button id="btn-sound-quiz" class="icon-btn sound-toggle-btn" data-sound-toggle="true" aria-label="Pengaturan Suara" title="Suara Interaktif (Klik untuk Menyalakan/Mematikan)"><span class="sound-btn-icon">🔊</span> <span class="label-text sound-btn-text">Suara: ON</span></button>
+        <a href="materi.html" class="icon-btn" aria-label="Kembali ke Eksplorasi 3D">🌐 <span class="label-text">Eksplorasi 3D</span></a>
+        <a href="index.html" class="icon-btn" aria-label="Kembali ke Beranda">🏠 <span class="label-text">Beranda</span></a>
+    </div>
+</header>
+
+<main class="quiz-main-container">
+    <div class="container">
+        <div class="glass-panel panel-padded fade-in quiz-card">
+            
+            <div class="quiz-top-info">
+                <div>
+                    <div class="section-label">EVALUASI PEMAHAMAN</div>
+                    <h2 class="section-heading" style="margin-bottom:4px;">Kuis: Peran Switch & Alur Data</h2>
+                </div>
+                <div class="kkm-pill">
+                    <span>KKM</span>
+                    <strong>75</strong>
+                </div>
+            </div>
+
+            <!-- Navigator Grid Nomor Soal (1 - 10) -->
+            <div class="quiz-nav-wrapper">
+                <div class="quiz-nav-label">
+                    <span>DAFTAR NOMOR SOAL:</span>
+                    <span id="quiz-answered-count" class="answered-badge">0 / 10 Terjawab</span>
+                </div>
+                <div id="quiz-num-grid" class="quiz-num-grid" role="tablist" aria-label="Daftar Nomor Soal"></div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="quiz-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                <div id="quiz-progress-fill" class="quiz-progress-fill" style="width: 10%;"></div>
+            </div>
+
+            <!-- Stage Kontainer Animasi Soal (Slide & Fade) -->
+            <div id="quiz-question-stage" class="quiz-question-stage">
+                <!-- Header Butir Soal -->
+                <div class="question-meta-row">
+                    <span id="quiz-cat-badge" class="quiz-cat-badge">🔀 PERAN SENTRAL SWITCH</span>
+                    <span id="quiz-counter" class="quiz-counter">Soal 1 dari 10</span>
+                </div>
+
+                <!-- Teks Pertanyaan -->
+                <p id="quiz-question" class="quiz-question">Memuat butir pertanyaan kuis...</p>
+
+                <!-- Daftar Pilihan Jawaban (A, B, C, D) -->
+                <div id="option-list" class="option-list" role="radiogroup" aria-label="Pilihan Jawaban"></div>
+            </div>
+
+            <!-- Tombol Aksi Navigasi Bawah -->
+            <div class="quiz-action-bar">
+                <button id="btn-prev-q" class="btn btn-outline" style="min-width:130px;" disabled>
+                    ← Sebelumnya
+                </button>
+                <button id="btn-next-q" class="btn btn-primary" style="min-width:130px;">
+                    Selanjutnya →
+                </button>
+                <button id="btn-finish-q" class="btn btn-success" style="min-width:180px;">
+                    Selesaikan Kuis ✓
+                </button>
+            </div>
+
+            <!-- Petunjuk Navigasi Keyboard -->
+            <div class="quiz-keyboard-tips">
+                ⌨️ <strong>Shortcut Keyboard:</strong> Tekan <strong>1, 2, 3, 4</strong> atau <strong>A, B, C, D</strong> untuk memilih opsi &bull; Tekan tombol panah <strong>← / →</strong> untuk berpindah soal.
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Modal Peringatan Soal Belum Terjawab -->
+<div id="modal-confirm-finish" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
+    <div class="glass-panel modal-box fade-in" style="max-width:440px; text-align:center;">
+        <div style="font-size:2.8rem; margin-bottom:10px;">⚠️</div>
+        <h3 id="modal-confirm-title" style="margin-bottom:8px;">Masih Ada Soal Belum Dijawab!</h3>
+        <p id="modal-confirm-desc" style="color:var(--gray); font-size:0.92rem; margin-bottom:20px;">
+            Anda baru menjawab 0 dari 10 soal. Soal yang belum dijawab akan dihitung sebagai salah.
+        </p>
+        <div class="btn-row" style="justify-content:center;">
+            <button id="btn-cancel-finish" class="btn btn-outline">Lanjut Mengerjakan</button>
+            <button id="btn-proceed-finish" class="btn btn-primary">Tetap Selesaikan</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/quiz.js"></script>
+</body>
+</html>

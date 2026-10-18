@@ -1,0 +1,6 @@
+{
+  "name": "Media Pembelajaran Interaktif 3D Topologi Jaringan Star",
+  "description": "Aplikasi media pembelajaran interaktif berbasis 3D untuk mempelajari hardware, fungsi perangkat, peran Switch sebagai konsentrator sentral, dan alur transmisi data pada Topologi Jaringan Star.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

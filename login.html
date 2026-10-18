@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- [FIX] Pengaman layar putih: CSS kritis inline & pembersih cache lama -->
+<style>
+html,body{background:#07111F;color:#fff;margin:0}
+.screen{display:none}.screen.active{display:flex}
+.network-bg{position:fixed;inset:0;z-index:0;opacity:.65}
+</style>
+<script>
+(function(){
+  try{
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      if(!regs.length)return;
+      Promise.all(regs.map(function(r){return r.unregister();}))
+        .then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));}):0;})
+        .then(function(){location.reload();});
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login Mahasiswa - Topologi Jaringan Star 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="auth-page">
+
+<canvas id="network-bg" class="network-bg"></canvas>
+
+<!-- Floating Audio Feedback Toggle Button -->
+<button type="button" class="floating-sound-btn sound-toggle-btn" data-sound-toggle="true" aria-label="Pengaturan Suara" title="Suara Interaktif (Klik untuk Menyalakan/Mematikan)">
+    <span class="sound-btn-icon">🔊</span>
+    <span class="sound-btn-text">Suara: ON</span>
+</button>
+
+<main class="auth-container fade-in">
+    <div class="auth-card">
+        <header class="auth-header">
+            <img src="logo-ulm.png" alt="Logo Universitas Lambung Mangkurat" class="auth-campus-logo" />
+            <h1 class="auth-title">Masuk Pembelajaran</h1>
+            <p class="auth-subtitle">
+                Silakan isi identitas Anda untuk mencatat kehadiran, progres eksplorasi 3D, dan hasil evaluasi kuis.
+        </header>
+
+        <!-- Banner Notifikasi Berhasil Logout -->
+        <div id="logout-alert-banner" style="display:none; margin-bottom:18px; padding:12px 16px; border-radius:var(--radius-md); background:rgba(0, 255, 136, 0.12); border:1px solid rgba(0, 255, 136, 0.4); color:#00ff88; font-size:0.86rem; text-align:center; animation:fadeIn 0.3s ease;">
+            ✅ <strong>Berhasil Keluar:</strong> Sesi pembelajaran Anda telah diakhiri. Silakan masukkan data kembali jika ingin memulai sesi baru.
+        </div>
+
+        <form id="student-login-form" class="auth-form" novalidate>
+            <!-- 1. NAMA LENGKAP -->
+            <div class="form-group">
+                <label for="input-nama" class="form-label">
+                    <span>Nama Lengkap <span class="req">*</span></span>
+                    <span style="font-size:0.7rem; color:var(--gray);">Min. 3 karakter</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="input-nama" 
+                    class="form-control" 
+                    placeholder="Contoh: Muhammad Ihsan" 
+                    autocomplete="name"
+                    required
+                />
+                <div id="error-nama" class="field-error"></div>
+            </div>
+
+            <!-- 2. NIM -->
+            <div class="form-group">
+                <label for="input-nim" class="form-label">
+                    <span>Nomor Induk Mahasiswa (NIM) <span class="req">*</span></span>
+                    <span style="font-size:0.7rem; color:var(--gray);">6–15 digit angka</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="input-nim" 
+                    class="form-control" 
+                    placeholder="Contoh: 2510130210011" 
+                    inputmode="numeric"
+                    maxlength="15"
+                    autocomplete="off"
+                    required
+                />
+                <div id="error-nim" class="field-error"></div>
+            </div>
+
+            <!-- 3. JURUSAN / PROGRAM STUDI -->
+            <div class="form-group">
+                <label for="select-jurusan" class="form-label">
+                    <span>Program Studi / Jurusan <span class="req">*</span></span>
+                </label>
+                <select id="select-jurusan" class="form-control" required>
+                    <!-- Diisi otomatis dari array DEPARTMENTS di auth.js -->
+                </select>
+                <div id="error-jurusan" class="field-error"></div>
+            </div>
+
+            <!-- TOMBOL MASUK -->
+            <div class="auth-actions">
+                <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width:100%; font-size:1rem; padding:13px 20px;">
+                    MASUK PEMBELAJARAN ➔
+                </button>
+            </div>
+        </form>
+
+        <footer class="auth-footer-links">
+            <a href="index.html" class="auth-link">← Kembali ke Beranda</a>
+            <a href="admin.html" class="auth-link" style="color:var(--gray); font-size:0.78rem;">Masuk sebagai Admin 🔐</a>
+        </footer>
+    </div>
+</main>
+
+<script src="js/loading.js"></script>
+<script type="module">
+import { DEPARTMENTS, populateDepartmentOptions, saveStudentSession, getStudentSession } from './js/auth.js';
+import { upsertStudent, getStudentByNim } from './js/storage.js';
+import { soundManager } from './js/sound.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    soundManager.attachGlobalButtonSounds();
+
+    // Toggle sound button binding
+    const soundBtns = document.querySelectorAll('.sound-toggle-btn, [data-sound-toggle]');
+    soundBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            soundManager.toggleSound();
+        });
+    });
+
+    const form = document.getElementById('student-login-form');
+    const inputNama = document.getElementById('input-nama');
+    const inputNim = document.getElementById('input-nim');
+    const selectJurusan = document.getElementById('select-jurusan');
+
+    const errNama = document.getElementById('error-nama');
+    const errNim = document.getElementById('error-nim');
+    const errJurusan = document.getElementById('error-jurusan');
+
+    // Isi opsi jurusan dari array
+    populateDepartmentOptions(selectJurusan);
+
+    // Tampilkan banner konfirmasi jika baru saja logout
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('logout') === '1') {
+        const banner = document.getElementById('logout-alert-banner');
+        if (banner) banner.style.display = 'block';
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+        // Auto-fill jika sesi masih ada dan bukan baru saja logout
+        const currentSession = getStudentSession();
+        if (currentSession) {
+            inputNama.value = currentSession.nama || '';
+            inputNim.value = currentSession.nim || '';
+            if (currentSession.jurusan) {
+                selectJurusan.value = currentSession.jurusan;
+            }
+        }
+    }
+
+    // Auto-fill nama/jurusan jika NIM yang sama sudah terdaftar
+    inputNim.addEventListener('blur', () => {
+        const nimVal = inputNim.value.trim();
+        if (/^\d{6,15}$/.test(nimVal)) {
+            const existing = getStudentByNim(nimVal);
+            if (existing) {
+                if (!inputNama.value.trim() && existing.nama) {
+                    inputNama.value = existing.nama;
+                }
+                if (existing.jurusan && selectJurusan) {
+                    selectJurusan.value = existing.jurusan;
+                }
+            }
+        }
+    });
+
+    // Validasi interaktif saat mengetik
+    inputNama.addEventListener('input', () => {
+        if (inputNama.value.trim().length >= 3) {
+            inputNama.classList.remove('is-invalid');
+            errNama.textContent = '';
+        }
+    });
+
+    inputNim.addEventListener('input', () => {
+        // Hanya izinkan angka
+        inputNim.value = inputNim.value.replace(/\D/g, '');
+        if (/^\d{6,15}$/.test(inputNim.value)) {
+            inputNim.classList.remove('is-invalid');
+            errNim.textContent = '';
+        }
+    });
+
+    selectJurusan.addEventListener('change', () => {
+        if (selectJurusan.value) {
+            selectJurusan.classList.remove('is-invalid');
+            errJurusan.textContent = '';
+        }
+    });
+
+    // Handle submit form
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const nama = inputNama.value.trim();
+        const nim = inputNim.value.trim();
+        const jurusan = selectJurusan.value;
+
+        let isValid = true;
+
+        // 1. Validasi Nama Lengkap
+        if (!nama) {
+            inputNama.classList.add('is-invalid');
+            errNama.textContent = 'Nama lengkap wajib diisi.';
+            isValid = false;
+        } else if (nama.length < 3) {
+            inputNama.classList.add('is-invalid');
+            errNama.textContent = 'Nama lengkap minimal 3 karakter.';
+            isValid = false;
+        } else {
+            inputNama.classList.remove('is-invalid');
+            errNama.textContent = '';
+        }
+
+        // 2. Validasi NIM
+        if (!nim) {
+            inputNim.classList.add('is-invalid');
+            errNim.textContent = 'NIM wajib diisi.';
+            isValid = false;
+        } else if (!/^\d{6,15}$/.test(nim)) {
+            inputNim.classList.add('is-invalid');
+            errNim.textContent = 'NIM harus berupa angka (6 hingga 15 digit).';
+            isValid = false;
+        } else {
+            inputNim.classList.remove('is-invalid');
+            errNim.textContent = '';
+        }
+
+        // 3. Validasi Jurusan
+        if (!jurusan) {
+            selectJurusan.classList.add('is-invalid');
+            errJurusan.textContent = 'Silakan pilih Program Studi / Jurusan Anda.';
+            isValid = false;
+        } else {
+            selectJurusan.classList.remove('is-invalid');
+            errJurusan.textContent = '';
+        }
+
+        if (!isValid) {
+            soundManager.playQuizWrong();
+            return;
+        }
+
+        // Simpan ke storage terpusat (upsertStudent) & simpan sesi
+        try {
+            const studentRecord = upsertStudent({ nama, nim, jurusan });
+            saveStudentSession(studentRecord);
+            soundManager.playClick();
+
+            // Arahkan ke alur berikutnya (index.html dengan auto-start)
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrl = urlParams.get('returnUrl');
+
+            if (returnUrl && returnUrl !== 'login.html') {
+                window.location.href = returnUrl;
+            } else {
+                // Default: kembali ke index.html dan langsung mulai
+                window.location.href = 'index.html?autostart=1';
+            }
+        } catch (err) {
+            console.error('Gagal login:', err);
+            if (errNim) errNim.textContent = 'Terjadi kendala saat menyimpan data login: ' + err.message;
+        }
+    });
+});
+</script>
+</body>
+</html>

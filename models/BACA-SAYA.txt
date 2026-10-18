@@ -1,0 +1,28 @@
+======================================================================
+PETUNJUK PENEMPATAN FILE MODEL 3D
+======================================================================
+
+Nama file model yang digunakan pada media pembelajaran ini:
+    topologi-star.glb
+
+Format file : GLB (Binary GLTF 2.0)
+Lokasi path : models/topologi-star.glb
+
+----------------------------------------------------------------------
+DAFTAR NODE / OBJECT DALAM MODEL 3D:
+----------------------------------------------------------------------
+Aplikasi secara otomatis mendeteksi objek 3D (auto-inspect) di console browser (F12):
+1. Switch   -> Perangkat konsentrator pusat (SwitchBody, Port, LED)
+2. PC01     -> Komputer Client 1 (CPU, Monitor, Screen, Keyboard, Mouse)
+3. PC02     -> Komputer Client 2
+4. PC03     -> Komputer Client 3
+5. PC04     -> Komputer Client 4
+6. PC05     -> Komputer Client 5
+7. PC06     -> Komputer Client 6
+8. Router   -> Gateway jaringan ke internet (RouterBody, Antenna)
+9. Printer  -> Network printer sharing (PrinterBody, Slot)
+10. Cable   -> Kabel UTP & Konektor RJ-45
+
+Jika file topologi-star.glb tersedia, aplikasi akan memuatnya melalui GLTFLoader.
+Aplikasi juga dilengkapi generator model prosedural jika file GLB sedang dimuat atau perlu di-fallback.
+======================================================================

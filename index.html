@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- [FIX] Pengaman layar putih: (1) CSS kritis inline, (2) bersihkan Service Worker/cache lama -->
+<style>
+html,body{background:#07111F;color:#fff;margin:0}
+.screen{display:none}.screen.active{display:flex}
+.network-bg{position:fixed;inset:0;z-index:0;opacity:.65}
+</style>
+<script>
+(function(){
+  try{
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      if(!regs.length)return;
+      Promise.all(regs.map(function(r){return r.unregister();}))
+        .then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));}):0;})
+        .then(function(){location.reload();});
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Media Pembelajaran Interaktif 3D Topologi Jaringan Star</title>
+<meta name="description" content="Aplikasi media pembelajaran interaktif berbasis 3D untuk mempelajari hardware, fungsi perangkat, peran Switch sebagai konsentrator sentral, dan alur transmisi data pada Topologi Jaringan Star." />
+<meta property="og:title" content="Media Pembelajaran Interaktif 3D Topologi Jaringan Star" />
+<meta property="og:description" content="Aplikasi media pembelajaran interaktif berbasis 3D untuk mempelajari hardware, fungsi perangkat, peran Switch sebagai konsentrator sentral, dan alur transmisi data pada Topologi Jaringan Star." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+
+<!-- Import map Three.js ES Module CDN -->
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+</head>
+<body>
+
+<!-- Overlay Transisi Antar Halaman Halus (Fade In/Out) -->
+<div id="page-transition-overlay" class="page-transition-overlay" aria-hidden="true">
+    <div class="page-transition-spinner"></div>
+    <div class="page-transition-text">Memuat Eksplorasi 3D...</div>
+</div>
+
+<!-- Informasi Mahasiswa yang Sedang Login -->
+<div id="student-nav-info" class="student-nav-container" style="display:none; position:fixed; top:20px; left:20px; z-index:1000;"></div>
+
+
+<!-- ======================= SCREEN 1: START ======================= -->
+<section id="screen-start" class="screen active">
+    <canvas id="network-bg" class="network-bg"></canvas>
+
+    <div class="start-content fade-in">
+        <!-- Logo Kampus Universitas Lambung Mangkurat -->
+        <div class="campus-logo-wrap">
+            <img src="logo-ulm.png" alt="Logo Universitas Lambung Mangkurat" class="campus-logo" />
+        </div>
+        <h1 class="title-main">
+            3D INTERACTIVE
+            <span class="accent">TOPOLOGI JARINGAN STAR</span>
+        </h1>
+        <p class="subtitle">
+            Media Pembelajaran Interaktif untuk Mengenal Hardware, Fungsi Perangkat,
+            dan Alur Kerja Transmisi Data Topologi Jaringan Star.
+        </p>
+        <div class="btn-row">
+            <button id="btn-start" class="btn btn-primary" aria-label="Mulai Pembelajaran Topologi Star">MULAI PEMBELAJARAN</button>
+        </div>
+    </div>
+</section>
+
+<!-- ======================= SCREEN 2: LOADING ======================= -->
+<section id="screen-loading" class="screen" aria-live="polite">
+    <div class="container">
+        <div class="loading-ring"></div>
+        <h2 class="loading-title">Memuat Media Pembelajaran...</h2>
+        <div class="progress-track">
+            <div id="loading-fill" class="progress-fill"></div>
+        </div>
+        <div id="loading-percent" class="progress-percent">0%</div>
+        <div id="loading-status" class="loading-status">Menyiapkan modul pembelajaran...</div>
+    </div>
+</section>
+
+<!-- ======================= SCREEN 3: TUJUAN PEMBELAJARAN ======================= -->
+<section id="screen-objectives" class="screen">
+    <div class="container">
+        <div class="glass-panel panel-padded fade-in">
+            <div class="section-label">KOMPETENSI DASAR</div>
+            <h2 class="section-heading">Tujuan Pembelajaran</h2>
+            <p style="color:var(--gray); margin-bottom:22px;">
+                Setelah menyelesaikan media pembelajaran interaktif ini, Anda diharapkan mampu:
+            </p>
+            <div class="objectives-grid">
+                <ul class="objectives-list">
+                    <li><span class="obj-num">1</span><span>Mengenali <strong>perangkat keras fisik</strong> pada Topologi Jaringan Star (Switch, PC Client, Kabel UTP, RJ-45, Router, Printer).</span></li>
+                    <li><span class="obj-num">2</span><span>Menjelaskan <strong>fungsi spesifik</strong> dari masing-masing perangkat jaringan.</span></li>
+                    <li><span class="obj-num">3</span><span>Memahami peran <strong>Switch sebagai konsentrator pusat</strong> dan Router sebagai gateway tambahan.</span></li>
+                    <li><span class="obj-num">4</span><span>Menganalisis <strong>alur proses pengiriman data</strong> (data wajib melewati Switch, tidak langsung antar-PC).</span></li>
+                    <li><span class="obj-num">5</span><span>Mengevaluasi kelebihan, kelemahan, serta toleransi gangguan pada Topologi Star.</span></li>
+                </ul>
+
+                <div class="topology-diagram glass-panel">
+                    <div class="diagram-caption">SKEMA TOPOLOGI STAR & SIMULASI ALUR DATA</div>
+                    
+                    <!-- Banner Status Live Simulasi Alur -->
+                    <div class="diagram-live-banner">
+                        <span class="live-pulse-dot"></span>
+                        <span id="diagram-status-badge">SIMULASI ALUR: PC 01 ➔ SWITCH ➔ PC 03</span>
+                    </div>
+
+                    <svg id="diagram-star-svg" viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg" class="diagram-svg" aria-label="Diagram Animasi Skema Topologi Star">
+                        <defs>
+                            <filter id="diagram-glow" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="3.5" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                            <filter id="switch-pulse-glow" x="-40%" y="-40%" width="180%" height="180%">
+                                <feGaussianBlur stdDeviation="5" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                            <radialGradient id="packet-rad-grad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#FFFFFF" />
+                                <stop offset="45%" stop-color="#00FFFF" />
+                                <stop offset="100%" stop-color="#0D6EFD" stop-opacity="0.3" />
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Garis koneksi kabel UTP point-to-point -->
+                        <line id="diag-line-router" class="diagram-line" x1="200" y1="190" x2="200" y2="48" />
+                        <line id="diag-line-pc01" class="diagram-line" x1="200" y1="190" x2="146" y2="97" />
+                        <line id="diag-line-pc02" class="diagram-line" x1="200" y1="190" x2="254" y2="97" />
+                        <line id="diag-line-pc03" class="diagram-line" x1="200" y1="190" x2="308" y2="190" />
+                        <line id="diag-line-pc04" class="diagram-line" x1="200" y1="190" x2="254" y2="283" />
+                        <line id="diag-line-pc05" class="diagram-line" x1="200" y1="190" x2="146" y2="283" />
+                        <line id="diag-line-pc06" class="diagram-line" x1="200" y1="190" x2="92" y2="190" />
+                        <line id="diag-line-printer" class="diagram-line diagram-line-dim" x1="200" y1="190" x2="200" y2="332" />
+
+                        <!-- Gelombang Ripple saat paket tiba di node -->
+                        <circle id="diag-ripple" cx="200" cy="190" r="0" fill="none" stroke="#00D9FF" stroke-width="2.5" opacity="0" />
+
+                        <!-- ROUTER -->
+                        <g id="diag-group-router" class="diagram-node-clickable" data-device="router">
+                            <rect id="diag-box-router" class="diagram-box diagram-box-secondary" x="166" y="14" width="68" height="34" rx="8" />
+                            <text class="diagram-label" x="200" y="35" text-anchor="middle">ROUTER</text>
+                        </g>
+
+                        <!-- SWITCH (PUSAT KONSENTRATOR) -->
+                        <g id="diag-group-switch" class="diagram-node-clickable" data-device="switch">
+                            <rect id="diag-box-switch" class="diagram-box diagram-box-hub" x="160" y="170" width="80" height="40" rx="9" />
+                            <text class="diagram-label diagram-label-hub" x="200" y="194" text-anchor="middle">SWITCH</text>
+                        </g>
+
+                        <!-- 6 PC CLIENT -->
+                        <g id="diag-group-pc01" class="diagram-node-clickable" data-device="pc01">
+                            <rect id="diag-box-pc01" class="diagram-box" x="114" y="82" width="64" height="30" rx="7" />
+                            <text class="diagram-label" x="146" y="102" text-anchor="middle">PC01</text>
+                        </g>
+
+                        <g id="diag-group-pc02" class="diagram-node-clickable" data-device="pc02">
+                            <rect id="diag-box-pc02" class="diagram-box" x="222" y="82" width="64" height="30" rx="7" />
+                            <text class="diagram-label" x="254" y="102" text-anchor="middle">PC02</text>
+                        </g>
+
+                        <g id="diag-group-pc03" class="diagram-node-clickable" data-device="pc03">
+                            <rect id="diag-box-pc03" class="diagram-box" x="276" y="175" width="64" height="30" rx="7" />
+                            <text class="diagram-label" x="308" y="195" text-anchor="middle">PC03</text>
+                        </g>
+
+                        <g id="diag-group-pc04" class="diagram-node-clickable" data-device="pc04">
+                            <rect id="diag-box-pc04" class="diagram-box" x="222" y="268" width="64" height="30" rx="7" />
+                            <text class="diagram-label" x="254" y="288" text-anchor="middle">PC04</text>
+                        </g>
+
+                        <g id="diag-group-pc05" class="diagram-node-clickable" data-device="pc05">
+                            <rect id="diag-box-pc05" class="diagram-box" x="114" y="268" width="64" height="30" rx="7" />
+                            <text class="diagram-label" x="146" y="288" text-anchor="middle">PC05</text>
+                        </g>
+
+                        <g id="diag-group-pc06" class="diagram-node-clickable" data-device="pc06">
+                            <rect id="diag-box-pc06" class="diagram-box" x="60" y="175" width="64" height="30" rx="7" />
+                            <text class="diagram-label" x="92" y="195" text-anchor="middle">PC06</text>
+                        </g>
+
+                        <!-- PRINTER (SHARED RESOURCE) -->
+                        <g id="diag-group-printer" class="diagram-node-clickable" data-device="printer">
+                            <rect id="diag-box-printer" class="diagram-box diagram-box-secondary" x="166" y="332" width="68" height="34" rx="8" />
+                            <text class="diagram-label" x="200" y="353" text-anchor="middle">PRINTER</text>
+                        </g>
+
+                        <!-- Elemen Paket Data Bergerak (Ethernet Frame) -->
+                        <g id="diag-packet-group" style="opacity:0; pointer-events:none;">
+                            <!-- Aura cahaya komet -->
+                            <circle id="diag-packet-halo" cx="0" cy="0" r="11" fill="url(#packet-rad-grad)" filter="url(#diagram-glow)" />
+                            <!-- Inti putih terang -->
+                            <circle id="diag-packet-core" cx="0" cy="0" r="4.5" fill="#FFFFFF" />
+                        </g>
+                    </svg>
+
+                    <!-- Deskripsi Tahapan Alur Konsentrator -->
+                    <div id="diagram-desc-text" class="diagram-desc-box">
+                        Memulai simulasi paket data topologi star...
+                    </div>
+
+                    <!-- Preset Tombol Rute Simulasi -->
+                    <div class="diagram-controls-panel">
+                        <div class="diagram-presets-label">PILIH RUTE TRANSMISI:</div>
+                        <div id="diagram-presets" class="diagram-presets">
+                            <button type="button" class="preset-btn active" data-src="pc01" data-tgt="pc03">PC01 ➔ PC03</button>
+                            <button type="button" class="preset-btn" data-src="pc02" data-tgt="pc05">PC02 ➔ PC05</button>
+                            <button type="button" class="preset-btn" data-src="pc04" data-tgt="printer">PC04 ➔ Printer</button>
+                            <button type="button" class="preset-btn" data-src="pc06" data-tgt="pc04">PC06 ➔ PC04</button>
+                            <button type="button" class="preset-btn" data-src="pc05" data-tgt="router">PC05 ➔ Router</button>
+                        </div>
+                        <div style="margin-top:10px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+                            <button id="diagram-btn-toggle" type="button" class="btn btn-outline btn-sm">⏸️ Jeda Animasi</button>
+                        </div>
+                    </div>
+
+                    <p class="diagram-note">
+                        💡 <strong>Interaksi Diagram:</strong> Klik pada perangkat mana saja (<strong>Switch, PC 01–06, Router, Printer</strong>) untuk membuka <strong>Spesifikasi Teknis & Peran Perangkat</strong> dalam Topologi Star! Anda juga dapat memilih rute simulasi di atas.
+                    </p>
+                </div>
+            </div>
+            <div class="btn-row" style="justify-content:flex-start; gap:12px; flex-wrap:wrap;">
+                <button id="btn-back-to-start" type="button" class="btn btn-outline" aria-label="Kembali ke Menu Utama">← MENU UTAMA</button>
+                <button id="btn-to-materi" type="button" class="btn btn-primary" aria-label="Lanjut ke eksplorasi 3D">MULAI EKSPLORASI 3D →</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======================= MODAL: DETAIL SPESIFIKASI & PERAN PERANGKAT ======================= -->
+<div id="modal-hardware-detail" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="hw-detail-title">
+    <div class="glass-panel modal-box fade-in hw-detail-modal-box">
+        <!-- Header -->
+        <div class="hw-detail-header">
+            <div class="hw-detail-title-group">
+                <div class="hw-detail-icon-wrap" id="hw-detail-icon">🔀</div>
+                <div>
+                    <div class="hw-detail-badge" id="hw-detail-badge">PERANGKAT PUSAT</div>
+                    <h3 id="hw-detail-title" class="hw-detail-title">Switch Jaringan Sentral</h3>
+                    <div id="hw-detail-sub" class="hw-detail-sub">Central Star Concentrator</div>
+                </div>
+            </div>
+            <button id="hw-detail-btn-close-header" type="button" class="hw-detail-close-btn" aria-label="Tutup Detail">&times;</button>
+        </div>
+
+        <!-- ======================= ELEMEN VISUAL 3D INTERAKTIF ROTASI PERANGKAT ======================= -->
+        <div class="hw-3d-section-container">
+            <div class="hw-3d-top-bar">
+                <div class="hw-3d-badge-group">
+                    <span class="hw-3d-live-indicator"></span>
+                    <span class="hw-3d-badge-title">INSPEKSI 3D INTERAKTIF</span>
+                    <span id="hw-3d-node-badge-text" class="hw-3d-badge-node">MODEL PERANGKAT</span>
+                </div>
+                <!-- 3D Controls Toolbar -->
+                <div class="hw-3d-toolbar">
+                    <button id="hw-3d-btn-autorotate" type="button" class="hw-3d-tool-btn active" title="Putar Otomatis (360°)" aria-label="Putar Otomatis">
+                        <span class="hw-3d-tool-icon">🔄</span>
+                        <span class="hw-3d-tool-text">Auto-Putar</span>
+                    </button>
+                    <button id="hw-3d-btn-reset" type="button" class="hw-3d-tool-btn" title="Kembalikan Sudut Awal" aria-label="Reset Sudut">
+                        <span class="hw-3d-tool-icon">⏮️</span>
+                        <span class="hw-3d-tool-text">Reset Sudut</span>
+                    </button>
+                    <button id="hw-3d-btn-wireframe" type="button" class="hw-3d-tool-btn" title="Mode Hologram / Realistis" aria-label="Mode Hologram">
+                        <span class="hw-3d-tool-icon">🌐</span>
+                        <span class="hw-3d-tool-text">Hologram</span>
+                    </button>
+                    <div class="hw-3d-zoom-group">
+                        <button id="hw-3d-btn-zoom-in" type="button" class="hw-3d-zoom-btn" title="Perbesar (+)" aria-label="Perbesar">+</button>
+                        <button id="hw-3d-btn-zoom-out" type="button" class="hw-3d-zoom-btn" title="Perkecil (−)" aria-label="Perkecil">−</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Viewport 3D -->
+            <div id="hw-3d-canvas-container" class="hw-3d-canvas-container">
+                <!-- Petunjuk Geser / Putar -->
+                <div id="hw-3d-hint-overlay" class="hw-3d-hint-overlay">
+                    <div class="hw-3d-hint-pill">
+                        <span class="hw-3d-hint-icon">🖱️</span>
+                        <span>Klik & geser untuk <strong>memutar model 3D (360°)</strong> • Scroll untuk zoom</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hw-3d-footer-hint">
+                <span>💡 <strong>Interaksi 3D:</strong> Model perangkat keras dapat diputar 360° (horizontal & vertikal) untuk memeriksa detail fisik port LAN, kabel UTP, dan indikator aktivitas.</span>
+            </div>
+        </div>
+
+        <!-- Peran Kunci dalam Topologi Star -->
+        <div class="hw-detail-role-card" id="hw-detail-role">
+            <strong>Peran Kunci:</strong> Switch adalah titik tumpu pusat...
+        </div>
+
+        <!-- Spesifikasi Teknis Grid -->
+        <div class="hw-detail-section-title">SPESIFIKASI TEKNIS PERANGKAT</div>
+        <div class="hw-detail-specs-grid" id="hw-detail-specs-grid">
+            <!-- Diisi secara dinamis dari js/hardware-details.js -->
+        </div>
+
+        <!-- Fungsi & Operasional -->
+        <div class="hw-detail-section-title" style="margin-top:16px;">FUNGSI & MEKANISME KERJA</div>
+        <p id="hw-detail-func" class="hw-detail-desc">-</p>
+
+        <!-- Contoh Kasus Nyata -->
+        <div class="hw-detail-section-title" style="margin-top:14px;">CONTOH PENGGUNAAN LAPANGAN</div>
+        <p id="hw-detail-example" class="hw-detail-desc" style="color:var(--gray);">-</p>
+
+        <!-- Action Row -->
+        <div class="hw-detail-actions">
+            <button id="hw-detail-btn-simulate" type="button" class="btn btn-primary" style="flex:1;">
+                ⚡ Simulasikan Alur Data
+            </button>
+            <button id="hw-detail-btn-close" type="button" class="btn btn-outline" style="min-width:110px;">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script src="js/loading.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

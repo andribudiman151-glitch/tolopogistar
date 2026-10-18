@@ -1,0 +1,10 @@
+======================================================================
+PETUNJUK PENEMPATAN FILE MODEL 3D
+======================================================================
+
+Nama file model yang digunakan pada media pembelajaran ini:
+    topologi-star.glb
+
+Format file : GLB (Binary GLTF 2.0)
+Lokasi path : models/topologi-star.glb
+======================================================================

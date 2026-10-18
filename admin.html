@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- [FIX] Pengaman layar putih: CSS kritis inline & pembersih cache lama -->
+<style>
+html,body{background:#07111F;color:#fff;margin:0}
+.screen{display:none}.screen.active{display:flex}
+.network-bg{position:fixed;inset:0;z-index:0;opacity:.65}
+</style>
+<script>
+(function(){
+  try{
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      if(!regs.length)return;
+      Promise.all(regs.map(function(r){return r.unregister();}))
+        .then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));}):0;})
+        .then(function(){location.reload();});
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel Administrator - Topologi Jaringan Star 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="admin-page">
+
+<!-- Floating Audio Feedback Toggle Button -->
+<button type="button" class="floating-sound-btn sound-toggle-btn" data-sound-toggle="true" aria-label="Pengaturan Suara" title="Suara Interaktif (Klik untuk Menyalakan/Mematikan)">
+    <span class="sound-btn-icon">🔊</span>
+    <span class="sound-btn-text">Suara: ON</span>
+</button>
+
+<!-- ======================= VIEW 1: LOGIN ADMIN ======================= -->
+<section id="admin-login-view" class="auth-page" style="display:none;">
+    <canvas id="network-bg" class="network-bg"></canvas>
+
+    <main class="auth-container fade-in">
+        <div class="auth-card">
+            <header class="auth-header">
+                <img src="logo-ulm.png" alt="Logo Universitas Lambung Mangkurat" class="auth-campus-logo" />
+                <h1 class="auth-title">Login Administrator</h1>
+                <p class="auth-subtitle">
+                    Akses dashboard pengawas untuk memantau data kehadiran dan evaluasi nilai mahasiswa.
+                </p>
+            </header>
+
+            <form id="admin-login-form" class="auth-form" autocomplete="off">
+                <div class="form-group">
+                    <label for="admin-username" class="form-label">
+                        <span>Nama Pengguna (Username)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="admin-username" 
+                        class="form-control" 
+                        placeholder="admin" 
+                        required 
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-password" class="form-label">
+                        <span>Kata Sandi (Password)</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="admin-password" 
+                        class="form-control" 
+                        placeholder="••••••••" 
+                        required 
+                    />
+                    <div id="admin-login-error" class="field-error"></div>
+                </div>
+
+                <div class="auth-actions">
+                    <button type="submit" class="btn btn-primary" style="width:100%; font-size:1rem; padding:13px 20px;">
+                        MASUK KE PANEL ADMIN ➔
+                    </button>
+                </div>
+            </form>
+
+            <footer class="auth-footer-links">
+                <a href="index.html" class="auth-link">← Kembali ke Halaman Pembelajaran</a>
+                <a href="login.html" class="auth-link">Login Mahasiswa 🎓</a>
+            </footer>
+        </div>
+    </main>
+</section>
+
+<!-- ======================= VIEW 2: DASHBOARD ADMIN ======================= -->
+<div id="admin-dashboard-view" style="display:none;">
+    <!-- Top Header Bar -->
+    <header class="admin-header">
+        <div class="admin-brand">
+            <img src="logo-ulm.png" alt="Logo ULM" style="width:34px; height:34px; object-fit:contain;" />
+            <div>
+                <div style="font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                    Topologi Star 3D <span class="admin-badge">ADMIN PANEL</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--gray);">Media Pembelajaran Interaktif ULM</div>
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <a href="index.html" class="icon-btn" style="font-size:0.8rem; padding:7px 14px;" title="Lihat Tampilan Siswa">
+                🌐 <span class="label-text">Tampilan Siswa</span>
+            </a>
+            <button id="btn-admin-logout" type="button" class="btn btn-outline" style="padding:7px 16px; font-size:0.82rem; border-color:#ff5c77; color:#ff99aa;">
+                Keluar 🚪
+            </button>
+        </div>
+    </header>
+
+    <main class="admin-main fade-in">
+        <div style="margin-bottom:24px;">
+            <h2 style="font-size:1.6rem; color:var(--white); margin-bottom:4px;">Dashboard Mahasiswa</h2>
+            <p style="color:var(--gray); font-size:0.9rem;">
+                Pantau keaktifan peserta didik, tingkat kelulusan KKM (≥ 75), dan riwayat pengerjaan kuis.
+            </p>
+        </div>
+
+        <!-- 5 KARTU STATISTIK RINGKASAN -->
+        <div class="stats-grid">
+            <!-- 1. Total Mahasiswa -->
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <span class="stat-label">TOTAL MAHASISWA</span>
+                    <strong id="stat-total-students" class="stat-value">0</strong>
+                </div>
+            </div>
+
+            <!-- 2. Total Percobaan Kuis -->
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-info">
+                    <span class="stat-label">TOTAL PERCOBAAN KUIS</span>
+                    <strong id="stat-total-attempts" class="stat-value">0</strong>
+                </div>
+            </div>
+
+            <!-- 3. Rata-Rata Nilai -->
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-info">
+                    <span class="stat-label">RATA-RATA NILAI</span>
+                    <strong id="stat-average-score" class="stat-value">-</strong>
+                </div>
+            </div>
+
+            <!-- 4. Lulus KKM -->
+            <div class="stat-card stat-success">
+                <div class="stat-icon">🎉</div>
+                <div class="stat-info">
+                    <span class="stat-label">LULUS KKM (≥ 75)</span>
+                    <strong id="stat-passed" class="stat-value" style="color:#00ff88;">0</strong>
+                </div>
+            </div>
+
+            <!-- 5. Belum Lulus -->
+            <div class="stat-card stat-fail">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-info">
+                    <span class="stat-label">BELUM LULUS (&lt; 75)</span>
+                    <strong id="stat-failed" class="stat-value" style="color:#ffc15e;">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOLBAR: PENCARIAN, FILTER, DAN EKSPOR -->
+        <div class="admin-toolbar">
+            <div class="toolbar-filters">
+                <!-- Search Box -->
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        id="admin-search-input" 
+                        class="form-control search-input" 
+                        placeholder="Cari berdasarkan Nama atau NIM..." 
+                    />
+                </div>
+
+                <!-- Filter Jurusan -->
+                <select id="admin-filter-jurusan" class="form-control" style="max-width:260px;">
+                    <option value="">Semua Program Studi / Jurusan</option>
+                </select>
+
+                <!-- Filter Status -->
+                <select id="admin-filter-status" class="form-control" style="max-width:180px;">
+                    <option value="">Semua Status</option>
+                    <option value="PASSED">Lulus KKM (≥ 75)</option>
+                    <option value="FAILED">Belum Lulus (&lt; 75)</option>
+                    <option value="NONE">Belum Kuis</option>
+                </select>
+            </div>
+
+            <div class="toolbar-actions">
+                <button type="button" id="btn-export-csv" class="btn btn-primary" style="padding:9px 18px; font-size:0.86rem;" title="Unduh data dalam format CSV untuk Microsoft Excel">
+                    📥 Ekspor CSV
+                </button>
+                <button type="button" id="btn-clear-all-data" class="btn btn-outline" style="padding:9px 16px; font-size:0.86rem; border-color:#ff5c77; color:#ff99aa;" title="Hapus seluruh rekaman data mahasiswa">
+                    🗑️ Hapus Semua Data
+                </button>
+            </div>
+        </div>
+
+        <!-- TABEL DATA MAHASISWA -->
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">No</th>
+                        <th class="sortable" data-sort="nama">NAMA MAHASISWA <span class="sort-indicator">⇅</span></th>
+                        <th class="sortable" data-sort="nim">NIM <span class="sort-indicator">⇅</span></th>
+                        <th class="sortable" data-sort="jurusan">JURUSAN <span class="sort-indicator">⇅</span></th>
+                        <th class="sortable" data-sort="lastLogin">LOGIN TERAKHIR <span class="sort-indicator">▼</span></th>
+                        <th class="sortable" data-sort="loginCount" style="text-align:center;">JML LOGIN <span class="sort-indicator">⇅</span></th>
+                        <th class="sortable" data-sort="lastScore" style="text-align:center;">NILAI TERAKHIR <span class="sort-indicator">⇅</span></th>
+                        <th class="sortable" data-sort="highScore" style="text-align:center;">NILAI TERTINGGI <span class="sort-indicator">⇅</span></th>
+                        <th>STATUS</th>
+                        <th style="width:130px;">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                    <!-- Diisi dinamis oleh admin.js -->
+                </tbody>
+            </table>
+
+            <!-- Empty State jika tidak ada data -->
+            <div id="admin-empty-state" class="empty-state" style="display:none;">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-title">Belum Ada Data Mahasiswa</div>
+                <p class="empty-state-desc">
+                    Data mahasiswa yang login dan hasil pengerjaan kuis akan tampil secara otomatis pada tabel ini.
+                </p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ======================= MODAL: DETAIL RIWAYAT KUIS MAHASISWA ======================= -->
+<div id="modal-student-detail" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+    <div class="glass-panel modal-box fade-in" style="max-width:580px; max-height:90vh; overflow-y:auto; padding:26px 28px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.09); padding-bottom:12px;">
+            <div>
+                <div style="font-size:0.75rem; color:var(--cyan); font-weight:700; letter-spacing:0.05em; margin-bottom:2px;">
+                    RIWAYAT PERCOBAAN EVALUASI
+                </div>
+                <h3 id="detail-modal-title" style="font-size:1.3rem; margin:0; color:var(--white);">Nama Mahasiswa</h3>
+                <div id="detail-modal-subtitle" style="font-size:0.82rem; color:var(--gray); margin-top:2px;">NIM: -</div>
+            </div>
+            <button id="btn-close-detail-modal" type="button" aria-label="Tutup Detail" style="background:none; border:none; color:var(--gray); font-size:1.8rem; cursor:pointer; line-height:1;">
+                &times;
+            </button>
+        </div>
+
+        <div style="font-size:0.84rem; color:var(--gray); margin-bottom:8px;">
+            Daftar seluruh pengerjaan kuis oleh mahasiswa ini:
+        </div>
+
+        <div id="detail-attempts-list" class="detail-attempts-list">
+            <!-- Diisi dinamis oleh admin.js -->
+        </div>
+
+        <div style="margin-top:22px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); text-align:right;">
+            <button type="button" class="btn btn-outline" style="min-width:100px;" onclick="document.getElementById('modal-student-detail').classList.remove('open')">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= MODAL: KONFIRMASI HAPUS SEMUA DATA ======================= -->
+<div id="modal-confirm-delete-all" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-all-modal-title" style="z-index: 10005;">
+    <div class="glass-panel modal-box fade-in" style="max-width:480px; padding:26px 24px; border:1px solid rgba(255, 92, 119, 0.4); box-shadow: 0 12px 40px rgba(255, 51, 85, 0.25);">
+        <div style="display:flex; align-items:flex-start; gap:16px; margin-bottom:18px;">
+            <div style="width:48px; height:48px; border-radius:50%; background:rgba(255, 51, 85, 0.15); border:1px solid rgba(255, 92, 119, 0.4); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0;">
+                🗑️
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.75rem; color:#ff99aa; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">
+                    KONFIRMASI PENGHAPUSAN DATABASE
+                </div>
+                <h3 id="delete-all-modal-title" style="font-size:1.25rem; margin:0 0 6px 0; color:var(--white);">
+                    Hapus Seluruh Data Mahasiswa?
+                </h3>
+            </div>
+            <button id="btn-close-delete-all-x" type="button" aria-label="Tutup" style="background:none; border:none; color:var(--gray); font-size:1.6rem; cursor:pointer; line-height:1; padding:0;">&times;</button>
+        </div>
+
+        <p style="color:var(--gray); font-size:0.88rem; line-height:1.5; margin:0 0 14px 0;">
+            Tindakan ini akan menghapus <strong>seluruh data identitas mahasiswa</strong> dan <strong>seluruh riwayat hasil kuis evaluasi</strong> dari sistem penyimpanan lokal secara permanen. Tindakan ini tidak dapat dibatalkan.
+        </p>
+
+        <div style="background:rgba(255, 92, 119, 0.1); border:1px solid rgba(255, 92, 119, 0.25); border-radius:8px; padding:10px 14px; margin-bottom:20px; font-size:0.84rem; color:#ffb3c1; display:flex; align-items:center; gap:8px;">
+            <span>⚠️</span>
+            <span>Jumlah data saat ini: <strong id="delete-all-count-preview" style="color:#fff;">0</strong> mahasiswa.</span>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" id="btn-cancel-delete-all" class="btn btn-outline" style="min-width:100px; padding:9px 16px;">
+                Batal
+            </button>
+            <button type="button" id="btn-confirm-delete-all" class="btn btn-primary" style="background:linear-gradient(135deg, #ff3355, #d91438); border-color:#ff5c77; color:#fff; font-weight:700; padding:9px 20px; box-shadow:0 4px 14px rgba(255, 51, 85, 0.35);">
+                🗑️ Ya, Hapus Semua Data
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= MODAL: KONFIRMASI HAPUS SATU MAHASISWA ======================= -->
+<div id="modal-confirm-delete-single" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-single-modal-title" style="z-index: 10005;">
+    <div class="glass-panel modal-box fade-in" style="max-width:460px; padding:26px 24px; border:1px solid rgba(255, 92, 119, 0.35);">
+        <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:16px;">
+            <div style="width:44px; height:44px; border-radius:50%; background:rgba(255, 51, 85, 0.15); border:1px solid rgba(255, 92, 119, 0.4); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">
+                ⚠️
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.75rem; color:#ff99aa; font-weight:700; letter-spacing:0.06em; margin-bottom:4px;">
+                    HAPUS DATA MAHASISWA
+                </div>
+                <h3 id="delete-single-modal-title" style="font-size:1.15rem; margin:0; color:var(--white);">
+                    Hapus Data Mahasiswa Ini?
+                </h3>
+            </div>
+            <button id="btn-close-delete-single-x" type="button" aria-label="Tutup" style="background:none; border:none; color:var(--gray); font-size:1.6rem; cursor:pointer; line-height:1; padding:0;">&times;</button>
+        </div>
+
+        <p style="color:var(--gray); font-size:0.88rem; line-height:1.5; margin:0 0 16px 0;">
+            Apakah Anda yakin ingin menghapus data mahasiswa <strong id="delete-single-student-name" style="color:var(--white);">-</strong> (<code id="delete-single-student-nim" style="color:var(--cyan);">-</code>) beserta riwayat kuisnya?
+        </p>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" id="btn-cancel-delete-single" class="btn btn-outline" style="min-width:90px; padding:8px 16px;">
+                Batal
+            </button>
+            <button type="button" id="btn-confirm-delete-single" class="btn btn-primary" style="background:linear-gradient(135deg, #ff3355, #d91438); border-color:#ff5c77; color:#fff; font-weight:700; padding:8px 18px;">
+                🗑️ Ya, Hapus Mahasiswa
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= MODAL: KONFIRMASI LOGOUT ADMIN ======================= -->
+<div id="modal-confirm-admin-logout" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="logout-admin-modal-title" style="z-index: 10005;">
+    <div class="glass-panel modal-box fade-in" style="max-width:440px; padding:26px 24px;">
+        <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:16px;">
+            <div style="width:44px; height:44px; border-radius:50%; background:rgba(0, 217, 255, 0.12); border:1px solid rgba(0, 217, 255, 0.35); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">
+                🚪
+            </div>
+            <div style="flex:1;">
+                <h3 id="logout-admin-modal-title" style="font-size:1.15rem; margin:0 0 4px 0; color:var(--white);">
+                    Keluar dari Panel Admin?
+                </h3>
+                <p style="color:var(--gray); font-size:0.86rem; margin:0; line-height:1.4;">
+                    Sesi administrator akan diakhiri dan layar akan kembali ke halaman masuk admin.
+                </p>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+            <button type="button" id="btn-cancel-admin-logout" class="btn btn-outline" style="min-width:90px; padding:8px 16px;">
+                Batal
+            </button>
+            <button type="button" id="btn-confirm-admin-logout" class="btn btn-primary" style="background:linear-gradient(135deg, #ff5c77, #d91438); border-color:#ff5c77; color:#fff; font-weight:700; padding:8px 18px;">
+                🚪 Ya, Keluar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= FLOATING TOAST NOTIFICATION ======================= -->
+<div id="admin-toast-container" class="admin-toast-container" aria-live="polite"></div>
+
+<script src="js/loading.js"></script>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

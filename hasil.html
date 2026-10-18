@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- [FIX] Pengaman layar putih: (1) CSS kritis inline, (2) bersihkan Service Worker/cache lama -->
+<style>
+html,body{background:#07111F;color:#fff;margin:0}
+.screen{display:none}.screen.active{display:block}
+.network-bg{position:fixed;inset:0;z-index:0;opacity:.65}
+</style>
+<script>
+(function(){
+  try{
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      if(!regs.length)return;
+      Promise.all(regs.map(function(r){return r.unregister();}))
+        .then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x);}));}):0;})
+        .then(function(){location.reload();});
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hasil Evaluasi - Topologi Jaringan Star</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="hasil-page">
+
+<!-- Top Bar Konsisten untuk Hasil Pembelajaran -->
+<header class="top-bar">
+    <div class="brand"><span class="dot"></span> Topologi Star 3D</div>
+
+    <!-- Biodata Pengembang Pemrograman di Bagian Atas -->
+    <div class="topbar-dev-pill" title="Biodata Pengembang Pemrograman">
+        <img src="logo-ulm.png" alt="Logo ULM" class="topbar-dev-photo" onerror="this.src='logo-ulman.png'" />
+        <div class="topbar-dev-info">
+            <span class="topbar-dev-badge-tag">BIODATA PENGEMBANG</span>
+            <span class="topbar-dev-fullname">Andri Budiman <small style="color:var(--cyan); font-weight:700;">(2510130210011)</small></span>
+            <span class="topbar-dev-subtitle">Teknologi Pendidikan B • Pemrograman Komputer</span>
+        </div>
+    </div>
+
+    <div class="top-bar-actions">
+        <!-- Informasi Mahasiswa Login & Tombol Keluar -->
+        <div id="student-nav-info" style="display:none;"></div>
+        <button id="btn-sound-hasil" class="icon-btn sound-toggle-btn" data-sound-toggle="true" aria-label="Pengaturan Suara" title="Suara Interaktif (Klik untuk Menyalakan/Mematikan)"><span class="sound-btn-icon">🔊</span> <span class="label-text sound-btn-text">Suara: ON</span></button>
+        <a href="index.html" class="icon-btn" aria-label="Kembali ke Beranda">🏠 <span class="label-text">Beranda</span></a>
+    </div>
+</header>
+
+<!-- ======================= VIEW 1: HASIL NILAI ======================= -->
+<section id="view-nilai" class="screen active">
+    <div class="container">
+        <div class="glass-panel panel-padded fade-in center-text">
+            <div class="section-label">HASIL EVALUASI PEMBELAJARAN</div>
+            <div id="nilai-emoji" class="emoji-lg">📊</div>
+            <div class="result-score"><span id="score-value">0</span><span class="max">/100</span></div>
+            <p id="score-sub" class="result-sub">0 dari 10 jawaban benar</p>
+
+            <div id="status-badge" class="status-badge success">BERHASIL</div>
+
+            <div class="kkm-compare">
+                <div><span>NILAI ANDA</span><strong id="kkm-score">0</strong></div>
+                <div><span>STANDAR KKM</span><strong id="kkm-value">75</strong></div>
+                <div><span>STATUS</span><strong id="kkm-status">-</strong></div>
+            </div>
+
+            <!-- Grafik Batang Dinamis Hasil Evaluasi (Chart.js) & Kontrol Apresiasi Visual -->
+            <div class="result-chart-wrapper glass-panel" style="margin: 26px auto 16px; max-width: 540px; padding: 20px 22px; background: rgba(7, 17, 31, 0.7); border: 1px solid var(--glass-border); border-radius: var(--radius-md); text-align: left;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--cyan); letter-spacing:0.06em;">VISUALISASI CAPAIAN KOMPETENSI</div>
+                        <h4 id="chart-title" style="font-size:0.98rem; margin:2px 0 0; color:var(--white);">Grafik Komparasi Nilai & KKM</h4>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button id="btn-chart-mode-score" type="button" class="btn btn-sm btn-outline active" style="font-size:0.75rem; padding:4px 10px;">Skor KKM</button>
+                        <button id="btn-chart-mode-category" type="button" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:4px 10px;">Per Topik</button>
+                        <button id="btn-confetti-replay" type="button" class="btn btn-sm btn-outline" title="Picu Efek Apresiasi Visual Confetti" style="font-size:0.75rem; padding:4px 10px; border-color:var(--cyan); color:var(--cyan);">🎊 Rayakan</button>
+                    </div>
+                </div>
+
+                <div style="position: relative; height: 220px; width: 100%;">
+                    <canvas id="quiz-result-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Ditampilkan jika BERHASIL (>= KKM) -->
+            <div id="success-block" style="display:none;">
+                <p style="color:var(--gray);">Selamat! Anda telah mencapai kompetensi minimal pembelajaran:</p>
+                <ul class="summary-list mt-16" style="text-align:left; max-width:420px; margin-inline:auto;">
+                    <li><span class="check">✓</span> Mengenal hardware jaringan (Switch, Router, PC, Kabel, RJ45)</li>
+                    <li><span class="check">✓</span> Memahami Switch sebagai pusat konsentrator utama</li>
+                    <li><span class="check">✓</span> Memahami Router dan Printer sebagai perangkat tambahan/sharing</li>
+                    <li><span class="check">✓</span> Memahami alur data wajib melewati Switch</li>
+                    <li><span class="check">✓</span> Mencapai standar Kriteria Ketuntasan Minimal (KKM)</li>
+                </ul>
+                <div class="btn-row">
+                    <button id="btn-selesai" class="btn btn-primary">SELESAI PEMBELAJARAN ➔</button>
+                    <button id="btn-ulangi-1" class="btn btn-outline">ULANGI KUIS</button>
+                    <button type="button" id="btn-logout-nilai-success" class="btn btn-outline student-logout-btn-action" style="border-color:#ff5c77; color:#ff99aa;">KELUAR AKUN 🚪</button>
+                </div>
+            </div>
+
+            <!-- Ditampilkan jika BELUM BERHASIL (< KKM) -->
+            <div id="fail-block" style="display:none;">
+                <p class="motivation-text">
+                    Belum mencapai KKM bukan berarti gagal. Anda dapat meninjau kembali pembahasan
+                    khusus untuk soal-soal yang salah sebelum mengulang kuis kembali.
+                </p>
+                <div class="btn-row">
+                    <button id="btn-lihat-pembahasan" class="btn btn-primary">LIHAT PEMBAHASAN SOAL SALAH</button>
+                    <button id="btn-pelajari-kembali" class="btn btn-outline">PELAJARI KEMBALI 3D</button>
+                    <button type="button" id="btn-logout-nilai-fail" class="btn btn-outline student-logout-btn-action" style="border-color:#ff5c77; color:#ff99aa;">KELUAR AKUN 🚪</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======================= VIEW 2: PEMBAHASAN SOAL SALAH ======================= -->
+<section id="view-pembahasan" class="screen">
+    <div class="container">
+        <div class="glass-panel panel-padded fade-in">
+            <div class="section-label">EVALUASI PEMBAHASAN</div>
+            <h2 class="section-heading">Soal yang Dijawab Kurang Tepat</h2>
+            <p style="color:var(--gray); margin-bottom:20px;">
+                Pelajari kembali konsep di bawah ini untuk memperkuat pemahaman mengenai Topologi Star:
+            </p>
+            
+            <div id="review-container"></div>
+
+            <div class="btn-row">
+                <button id="btn-ulangi-2" class="btn btn-primary">ULANGI KUIS</button>
+                <a href="materi.html" class="btn btn-outline">KEMBALI KE MATERI 3D</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======================= VIEW 3: SELESAI ======================= -->
+<section id="view-selesai" class="screen">
+    <div class="container">
+        <div class="glass-panel panel-padded fade-in center-text">
+            <div class="emoji-lg">🎉</div>
+            <h2 class="section-heading">Pembelajaran Selesai</h2>
+            <p style="color:var(--gray); max-width:520px; margin:0 auto 20px;">
+                Selamat! Anda telah menyelesaikan seluruh rangkaian media pembelajaran interaktif
+                Topologi Jaringan Star dengan tuntas.
+            </p>
+
+            <!-- Biodata Pengembang di Halaman Akhir Selesai Pembelajaran -->
+            <div class="developer-profile-card glass-panel" style="margin-bottom:26px;" aria-label="Biodata Pengembang Media">
+                <div class="dev-badge-header">
+                    <div class="dev-badge-brand">
+                        <img src="logo-ulm.png" alt="Logo ULM" class="dev-ulm-thumb" />
+                        <div>
+                            <div class="dev-badge-title">BIODATA PENGEMBANG PEMROGRAMAN</div>
+                            <div class="dev-badge-sub">Teknologi Pendidikan B • Universitas Lambung Mangkurat</div>
+                        </div>
+                    </div>
+                    <span class="dev-course-badge">Pemrograman Komputer</span>
+                </div>
+                <div class="dev-card-layout" style="justify-content:center;">
+                    <div class="dev-info-list" style="width:100%; max-width:480px;">
+                        <div class="dev-info-item">
+                            <span class="dev-label">Nama</span>
+                            <strong class="dev-val">Andri Budiman</strong>
+                        </div>
+                        <div class="dev-info-item">
+                            <span class="dev-label">NIM</span>
+                            <span class="dev-val dev-nim">2510130210011</span>
+                        </div>
+                        <div class="dev-info-item">
+                            <span class="dev-label">Jurusan</span>
+                            <span class="dev-val">Teknologi Pendidikan B</span>
+                        </div>
+                        <div class="dev-info-item">
+                            <span class="dev-label">Mata Kuliah</span>
+                            <strong class="dev-val" style="color:var(--cyan);">Pemrograman Komputer</strong>
+                        </div>
+                        <div class="dev-info-item">
+                            <span class="dev-label">Kampus</span>
+                            <span class="dev-val">Universitas Lambung Mangkurat</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row" style="margin-top:24px; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <button id="btn-beranda" class="btn btn-primary" style="min-width:180px;">🏠 KEMBALI KE BERANDA</button>
+                <button type="button" id="btn-logout-selesai" class="btn btn-outline student-logout-btn-action" style="min-width:200px; border-color:#ff5c77; color:#ff99aa; font-weight:700; box-shadow:0 0 16px rgba(255, 92, 119, 0.25);">
+                    KELUAR DARI AKUN (LOG OUT) 🚪
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="module" src="js/result.js"></script>
+</body>
+</html>
